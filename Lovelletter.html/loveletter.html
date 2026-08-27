@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Will You Go On A Date With Me?</title>
+<style>
+  :root {
+    --pink: #ff6b9d;
+    --pink-dark: #e64980;
+    --cream: #fff0f5;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ffe3ec 0%, #ffd4e5 50%, #ffc2dd 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card {
+    background: white;
+    border-radius: 24px;
+    padding: 48px 40px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(230, 73, 128, 0.25);
+    max-width: 420px;
+    width: 90%;
+    position: relative;
+    z-index: 2;
+    transition: transform 0.3s ease;
+  }
+
+  h1 {
+    color: var(--pink-dark);
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    color: #a94766;
+    font-size: 0.95rem;
+    margin-bottom: 32px;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    position: relative;
+    height: 60px;
+  }
+
+  button {
+    padding: 14px 32px;
+    border-radius: 30px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  #yesBtn {
+    background: var(--pink);
+    color: white;
+    box-shadow: 0 8px 20px rgba(255, 107, 157, 0.4);
+  }
+
+  #yesBtn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 10px 24px rgba(255, 107, 157, 0.55);
+  }
+
+  #noBtn {
+    background: #f1f1f1;
+    color: #888;
+    position: relative;
+  }
+
+  #noBtn.roaming {
+    position: fixed;
+    z-index: 10;
+  }
+
+  .emoji {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+  }
+
+  #successCard {
+    display: none;
+  }
+
+  #successCard .emoji {
+    font-size: 3rem;
+  }
+
+  #successCard h1 {
+    font-size: 1.5rem;
+  }
+
+  .plan-box {
+    background: var(--cream);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: left;
+  }
+
+  .plan-box p {
+    margin: 6px 0;
+    color: #7a3a52;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .plan-box .label {
+    font-weight: 700;
+    color: var(--pink-dark);
+  }
+
+  .no-counter {
+    margin-top: 18px;
+    font-size: 0.8rem;
+    color: #c48;
+    min-height: 16px;
+  }
+
+  .heart {
+    position: fixed;
+    top: -40px;
+    font-size: 1.5rem;
+    animation: fall linear forwards;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  @keyframes fall {
+    to {
+      transform: translateY(110vh) rotate(360deg);
+      opacity: 0.2;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="askCard">
+  <div class="emoji">💌</div>
+  <h1>Pasundoga mi malooy ka?</h1>
+  <p class="subtitle">Sugot lang gudt gina....</p>
+  <div class="buttons">
+    <button id="yesBtn">Yes 💕</button>
+    <button id="noBtn">No</button>
+  </div>
+  <div class="no-counter" id="noCounter"></div>
+</div>
+
+<div class="card" id="successCard">
+  <div class="emoji">🎉</div>
+  <h1>Salamat Daaan </h1>
+  <div class="plan-box">
+    <p><span class="label">📅 Looykaymi:</span> Pag palain ka ng panginaon...</p>
+    <p><span class="label">📍 Ginaaa:</span> Bahalag gamay lang.. </p>
+    <p><span class="label">💬 Salamat daan:</span> Malion man namo ang uban</p>
+  </div>
+</div>
+
+<script>
+  const yesBtn = document.getElementById('yesBtn');
+  const noBtn = document.getElementById('noBtn');
+  const askCard = document.getElementById('askCard');
+  const successCard = document.getElementById('successCard');
+  const noCounter = document.getElementById('noCounter');
+
+  const declineMessages = [
+    "Are you sure? 🥺",
+    "Really?? Come on...",
+    "Pretty please? 🍦",
+    "You're breaking my heart 💔",
+    "I'll keep asking!",
+    "Catch me if you can 😏",
+    "Okay now you're just being stubborn",
+    "The button believes in true love 💫"
+  ];
+
+  let noCount = 0;
+
+  function moveNoButton() {
+    const btnRect = noBtn.getBoundingClientRect();
+    const padding = 20;
+    const maxX = window.innerWidth - btnRect.width - padding;
+    const maxY = window.innerHeight - btnRect.height - padding;
+
+    const randX = Math.random() * (maxX - padding) + padding;
+    const randY = Math.random() * (maxY - padding) + padding;
+
+    noBtn.classList.add('roaming');
+    noBtn.style.left = randX + 'px';
+    noBtn.style.top = randY + 'px';
+  }
+
+  noBtn.addEventListener('click', () => {
+    noCount++;
+    moveNoButton();
+    noCounter.textContent = declineMessages[Math.min(noCount - 1, declineMessages.length - 1)];
+
+    // grow yes button a little each time, for fun
+    const scale = Math.min(1 + noCount * 0.08, 1.8);
+    yesBtn.style.transform = `scale(${scale})`;
+  });
+
+  // also dodge on hover for extra chaos, once it's already roaming
+  noBtn.addEventListener('mouseenter', () => {
+    if (noBtn.classList.contains('roaming')) {
+      moveNoButton();
+    }
+  });
+
+  yesBtn.addEventListener('click', () => {
+    askCard.style.display = 'none';
+    successCard.style.display = 'block';
+    launchHearts();
+  });
+
+  function launchHearts() {
+    const emojis = ['💖', '💕', '❤️', '💗', '💓'];
+    for (let i = 0; i < 30; i++) {
+      setTimeout(() => {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+        heart.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 5000);
+      }, i * 80);
+    }
+  }
+</script>
+
+</body>
+</html>
